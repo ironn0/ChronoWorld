@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChronoWorld - Esempio 1: Leaflet + Vanilla JS</title>
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <!-- noUiSlider CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.1/nouislider.min.css" />
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🌍 ChronoWorld</h1>
+            <p>Esplora i confini storici attraverso il tempo</p>
+        </header>
+
+        <div class="controls">
+            <div class="year-display">
+                <span id="currentYear">1914</span>
+            </div>
+            <div id="yearSlider"></div>
+            <div class="year-labels">
+                <span>1800</span>
+                <span>2024</span>
+            </div>
+        </div>
+
+        <div id="map"></div>
+
+        <div class="info-panel" id="infoPanel">
+            <h3>ℹ️ Informazioni</h3>
+            <div id="infoContent">
+                <p>Seleziona un territorio sulla mappa per vedere le informazioni storiche.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- noUiSlider JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.1/nouislider.min.js"></script>
+    
+    <script src="script.js"></script>
+</body>
+</html>

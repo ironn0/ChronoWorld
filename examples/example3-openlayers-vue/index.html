@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChronoWorld - Esempio 3: OpenLayers + Vue</title>
+    
+    <!-- OpenLayers CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@8.2.0/ol.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+        }
+
+        #app {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: white;
+            padding: 2rem;
+            border-radius: 20px 20px 0 0;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            color: #1e3c72;
+            margin-bottom: 0.5rem;
+        }
+
+        .header .subtitle {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .main-container {
+            background: white;
+            border-radius: 0 0 20px 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+
+        .controls-bar {
+            background: #f8f9fa;
+            padding: 2rem;
+            border-bottom: 2px solid #e0e0e0;
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .year-control {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .year-display {
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .year-text {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #1e3c72;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .period-name {
+            font-size: 0.9rem;
+            color: #666;
+            font-style: italic;
+        }
+
+        .slider-wrapper {
+            position: relative;
+        }
+
+        .year-slider {
+            width: 100%;
+            height: 10px;
+            border-radius: 5px;
+            background: #ddd;
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .year-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            cursor: pointer;
+            box-shadow: 0 3px 15px rgba(30, 60, 114, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .year-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        .year-slider::-moz-range-thumb {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            cursor: pointer;
+            border: none;
+        }
+
+        .quick-periods {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .quick-periods h3 {
+            color: #1e3c72;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .period-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 0.75rem;
+        }
+
+        .period-btn {
+            padding: 0.75rem 1rem;
+            border: 2px solid #1e3c72;
+            background: white;
+            color: #1e3c72;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .period-btn:hover {
+            background: #1e3c72;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(30, 60, 114, 0.3);
+        }
+
+        .period-btn.active {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+        }
+
+        .map-section {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 0;
+        }
+
+        .map-container {
+            height: 600px;
+            position: relative;
+            background: #e0e0e0;
+        }
+
+        .sidebar {
+            background: #f8f9fa;
+            padding: 2rem;
+            overflow-y: auto;
+            border-left: 2px solid #e0e0e0;
+        }
+
+        .sidebar h3 {
+            color: #1e3c72;
+            margin-bottom: 1.5rem;
+            font-size: 1.3rem;
+        }
+
+        .legend {
+            margin-bottom: 2rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: white;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .legend-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .legend-color {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .legend-name {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .info-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            border-left: 4px solid #1e3c72;
+            margin-bottom: 1rem;
+        }
+
+        .info-card h4 {
+            color: #1e3c72;
+            margin-bottom: 0.75rem;
+        }
+
+        .info-card p {
+            color: #666;
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .stat-box {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #1e3c72;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 0.25rem;
+        }
+
+        .animation-controls {
+            margin-top: 1rem;
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .control-btn {
+            flex: 1;
+            padding: 0.75rem;
+            background: #1e3c72;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .control-btn:hover {
+            background: #2a5298;
+            transform: scale(1.05);
+        }
+
+        .control-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        @media (max-width: 1024px) {
+            .map-section {
+                grid-template-columns: 1fr;
+            }
+
+            .controls-bar {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                border-left: none;
+                border-top: 2px solid #e0e0e0;
+            }
+        }
+
+        /* Popup personalizzato per OpenLayers */
+        .ol-popup {
+            position: absolute;
+            background-color: white;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 10px;
+            border: 2px solid #1e3c72;
+            min-width: 200px;
+        }
+
+        .ol-popup:after {
+            content: "";
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-top: 10px solid white;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="header">
+            <h1>🗺️ ChronoWorld</h1>
+            <p class="subtitle">Potente visualizzazione con OpenLayers + Vue.js</p>
+        </div>
+
+        <div class="main-container">
+            <div class="controls-bar">
+                <div class="year-control">
+                    <div class="year-display">
+                        <div class="year-text">{{ currentYear }}</div>
+                        <div class="period-name">{{ currentPeriod }}</div>
+                    </div>
+                    <div class="slider-wrapper">
+                        <input
+                            type="range"
+                            min="1800"
+                            max="2024"
+                            v-model="currentYear"
+                            class="year-slider"
+                        />
+                    </div>
+                    <div class="animation-controls">
+                        <button class="control-btn" @click="playAnimation" :disabled="isAnimating">
+                            ▶️ Riproduci
+                        </button>
+                        <button class="control-btn" @click="stopAnimation" :disabled="!isAnimating">
+                            ⏸️ Pausa
+                        </button>
+                        <button class="control-btn" @click="resetAnimation">
+                            ⏮️ Reset
+                        </button>
+                    </div>
+                </div>
+
+                <div class="quick-periods">
+                    <h3>📅 Periodi Storici</h3>
+                    <div class="period-buttons">
+                        <button
+                            v-for="period in keyPeriods"
+                            :key="period.year"
+                            :class="['period-btn', { active: currentYear == period.year }]"
+                            @click="currentYear = period.year"
+                        >
+                            {{ period.year }}<br>
+                            <small>{{ period.label }}</small>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="map-section">
+                <div class="map-container">
+                    <div id="map" style="width: 100%; height: 100%;"></div>
+                </div>
+
+                <div class="sidebar">
+                    <div class="legend">
+                        <h3>🎨 Territori</h3>
+                        <div
+                            v-for="territory in currentTerritories"
+                            :key="territory.id"
+                            class="legend-item"
+                            @click="focusTerritory(territory)"
+                        >
+                            <div class="legend-color" :style="{ backgroundColor: territory.color }"></div>
+                            <div class="legend-name">{{ territory.name }}</div>
+                        </div>
+                    </div>
+
+                    <div v-if="selectedTerritory" class="info-card">
+                        <h4>{{ selectedTerritory.name }}</h4>
+                        <p>{{ selectedTerritory.info }}</p>
+                        <div class="stats">
+                            <div class="stat-box">
+                                <div class="stat-number">{{ closestDataYear }}</div>
+                                <div class="stat-label">Anno dati</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-number">{{ currentTerritories.length }}</div>
+                                <div class="stat-label">Territori</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <h4>ℹ️ Contesto Storico</h4>
+                        <p>{{ currentContext }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Vue.js 3 -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    
+    <!-- OpenLayers -->
+    <script src="https://cdn.jsdelivr.net/npm/ol@8.2.0/dist/ol.js"></script>
+    
+    <script src="app.js"></script>
+</body>
+</html>

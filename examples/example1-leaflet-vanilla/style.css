@@ -1,0 +1,135 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    overflow: hidden;
+}
+
+header {
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    color: white;
+    padding: 30px;
+    text-align: center;
+}
+
+header h1 {
+    font-size: 2.5em;
+    margin-bottom: 10px;
+}
+
+header p {
+    font-size: 1.1em;
+    opacity: 0.9;
+}
+
+.controls {
+    padding: 30px;
+    background: #f8f9fa;
+    border-bottom: 2px solid #e0e0e0;
+}
+
+.year-display {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+#currentYear {
+    font-size: 3em;
+    font-weight: bold;
+    color: #1e3c72;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+}
+
+#yearSlider {
+    margin: 20px 0;
+}
+
+.year-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9em;
+    color: #666;
+    margin-top: 10px;
+}
+
+#map {
+    height: 500px;
+    width: 100%;
+}
+
+.info-panel {
+    padding: 30px;
+    background: #fff;
+    border-top: 2px solid #e0e0e0;
+    min-height: 150px;
+}
+
+.info-panel h3 {
+    color: #1e3c72;
+    margin-bottom: 15px;
+}
+
+#infoContent {
+    color: #333;
+    line-height: 1.6;
+}
+
+/* Stile per noUiSlider */
+.noUi-connect {
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+}
+
+.noUi-handle {
+    background: #fff;
+    border: 3px solid #667eea;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    cursor: pointer;
+}
+
+.noUi-handle:before,
+.noUi-handle:after {
+    display: none;
+}
+
+/* Stile per i poligoni sulla mappa */
+.country-polygon {
+    stroke: #2c3e50;
+    stroke-width: 2;
+    fill-opacity: 0.6;
+    transition: all 0.3s ease;
+}
+
+.country-polygon:hover {
+    fill-opacity: 0.8;
+    stroke-width: 3;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    header h1 {
+        font-size: 1.8em;
+    }
+    
+    #currentYear {
+        font-size: 2em;
+    }
+    
+    #map {
+        height: 400px;
+    }
+}
