@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Rapido - ChronoWorld</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        body { margin: 0; padding: 0; font-family: Arial, sans-serif; }
+        #map { height: 100vh; width: 100%; }
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 9999;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+    </style>
+</head>
+<body>
+    <div id="loading" class="loading">
+        <h2>🌍 Caricamento mappa...</h2>
+        <p id="status">Inizializzazione...</p>
+    </div>
+    <div id="map"></div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        const statusEl = document.getElementById('status');
+        const loadingEl = document.getElementById('loading');
+
+        // 1. Crea mappa
+        statusEl.textContent = 'Creazione mappa...';
+        console.log('✅ Creazione mappa');
+        const map = L.map('map').setView([50, 10], 4);
+
+        // 2. Aggiungi tile layer
+        statusEl.textContent = 'Caricamento mappa base...';
+        console.log('✅ Aggiunta tile layer');
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png', {
+            attribution: '© OpenStreetMap © CARTO',
+            maxZoom: 20,
+            opacity: 0.6
+        }).addTo(map);
+
+        // 3. Carica GeoJSON
+        statusEl.textContent = 'Caricamento dati storici... (~1.5 MB)';
+        console.log('✅ Inizio fetch GeoJSON');
+        
+        fetch('../../data/world_1914.geojson')
+            .then(response => {
+                console.log('✅ Response ricevuta:', response.status);
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                statusEl.textContent = 'Parsing dati...';
+                return response.json();
+            })
+            .then(geojson => {
+                console.log('✅ GeoJSON parsato:', geojson.features.length, 'paesi');
+                statusEl.textContent = 'Rendering mappa...';
+                
+                // 4. Aggiungi alla mappa
+                L.geoJSON(geojson, {
+                    style: {
+                        fillColor: '#4ECDC4',
+                        weight: 2,
+                        opacity: 1,
+                        color: '#333',
+                        fillOpacity: 0.6
+                    },
+                    onEachFeature: (feature, layer) => {
+                        const name = feature.properties.NAME || 'Sconosciuto';
+                        layer.bindPopup(`<strong>${name}</strong><br>Anno: 1914`);
+                    }
+                }).addTo(map);
+
+                console.log('✅ Mappa renderizzata!');
+                loadingEl.remove();
+            })
+            .catch(error => {
+                console.error('❌ Errore:', error);
+                statusEl.innerHTML = `
+                    <span style="color: red;">❌ Errore: ${error.message}</span><br>
+                    <small>Verifica che il file world_1914.geojson esista in data/</small><br>
+                    <small>Server attivo su http://localhost:8000</small>
+                `;
+            });
+    </script>
+</body>
+</html>
