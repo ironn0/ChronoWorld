@@ -13,18 +13,44 @@ A differenza degli esempi 1-3 che usano coordinate inventate, **qui i confini so
 - ✅ **Geometrie precise** in formato GeoJSON
 - ✅ **Metadati ricchi** (subordinazione, precisione confini)
 - ✅ **Mappa senza confini moderni** (CartoDB nolabels)
+- ✅ **Etichette dei paesi** con nomi storici
+- ✅ **Dimensionamento automatico** etichette in base all'area
+- ✅ **Toggle on/off** per mostrare/nascondere etichette
+- ✅ **6 anni disponibili** (1880-1994)
 
 ## 📊 Dataset Disponibili
 
-### Anno 1900
+### ✅ Inclusi nel Repository
+
+#### Anno 1900
 - **File**: `world_1900.geojson` (~1.3 MB)
 - **Stati inclusi**: ~150 entità politiche
 - **Periodo**: Fine dell'era coloniale
 
-### Anno 1914
+#### Anno 1914
 - **File**: `world_1914.geojson` (~1.5 MB)
 - **Stati inclusi**: ~170 entità politiche
 - **Periodo**: Vigilia della Prima Guerra Mondiale
+
+### 📥 Da Scaricare Separatamente
+
+Vedi **[data/README_DOWNLOAD.md](../../data/README_DOWNLOAD.md)** per istruzioni!
+
+#### Anno 1880
+- **Periodo**: Era coloniale (Impero Britannico al suo apice)
+- **Dimensione**: ~1.2 MB
+
+#### Anno 1920
+- **Periodo**: Post Prima Guerra Mondiale (crollo imperi)
+- **Dimensione**: ~1.4 MB
+
+#### Anno 1945
+- **Periodo**: Fine Seconda Guerra Mondiale
+- **Dimensione**: ~1.6 MB
+
+#### Anno 1994
+- **Periodo**: Post Guerra Fredda (crollo URSS)
+- **Dimensione**: ~2.1 MB
 
 ## 🎯 Come Funziona
 
@@ -42,6 +68,17 @@ L.geoJSON(geojsonData, {
             fillOpacity: 0.6
         };
     }
+}).addTo(map);
+
+// 3. Calcola il centroide per ogni paese
+const center = getPolygonCenter(geometry.coordinates);
+
+// 4. Crea etichetta con il nome del paese
+L.marker(center, {
+    icon: L.divIcon({
+        className: 'country-label',
+        html: countryName
+    })
 }).addTo(map);
 ```
 
@@ -77,13 +114,18 @@ python -m http.server 8000
 ```
 
 ### 2. Seleziona l'anno
-- **1900**: Era coloniale
+- **1880**: Era coloniale
+- **1900**: Fine XIX secolo
 - **1914**: Prima Guerra Mondiale
+- **1920**: Post WWI (crollo imperi)
+- **1945**: Fine WWII
+- **1994**: Post Guerra Fredda
 
 ### 3. Esplora i territori
 - **Hover**: Evidenzia il territorio
 - **Click**: Mostra dettagli nel pannello laterale
 - **Zoom**: Ingrandisci per vedere confini precisi
+- **Checkbox Etichette**: Mostra/nascondi nomi dei paesi
 
 ## 📥 Aggiungere Altri Anni
 
