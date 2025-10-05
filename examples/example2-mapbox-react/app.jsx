@@ -1,9 +1,9 @@
-// NOTA: Per usare Mapbox, serve una API key gratuita da https://www.mapbox.com/
-// Sostituisci 'YOUR_MAPBOX_TOKEN' con la tua chiave
+// Questo esempio usa Leaflet invece di Mapbox per evitare la necessità di API key
+// Puoi comunque passare a Mapbox se preferisci la grafica più avanzata
 
 const { useState, useEffect, useRef } = React;
 
-// Dati storici con coordinate GeoJSON
+// Dati storici con poligoni GeoJSON
 const historicalData = {
     1800: {
         year: 1800,
@@ -13,25 +13,36 @@ const historicalData = {
                 id: 'austria-1800',
                 name: "Impero Austriaco",
                 coordinates: [16.3738, 48.2082],
-                bounds: [[14, 46], [18, 50]],
+                polygon: [
+                    [22.0, 48.5], [18.0, 49.0], [16.4, 48.2], [13.0, 47.5],
+                    [13.5, 46.5], [15.0, 46.0], [14.0, 45.5], [15.5, 45.0],
+                    [17.0, 46.0], [19.0, 47.0], [21.0, 47.5], [22.0, 48.5]
+                ],
                 color: "#FFD700",
-                info: "L'Impero Austriaco era una delle grandi potenze europee, governato dagli Asburgo. Controllava vasti territori in Europa centrale e orientale."
+                info: "L'Impero Austriaco era una delle grandi potenze europee, governato dagli Asburgo."
             },
             {
                 id: 'france-1800',
                 name: "Francia Napoleonica",
                 coordinates: [2.3522, 48.8566],
-                bounds: [[0, 42], [8, 51]],
+                polygon: [
+                    [2.5, 51.0], [-1.5, 50.5], [-4.5, 48.5], [-2.0, 47.0],
+                    [-1.0, 43.5], [3.0, 43.0], [7.0, 42.5], [8.5, 44.0],
+                    [7.0, 45.5], [7.5, 47.5], [6.0, 49.0], [4.0, 50.0], [2.5, 51.0]
+                ],
                 color: "#0055A4",
-                info: "Sotto Napoleone Bonaparte, la Francia stava espandendo il suo controllo su gran parte dell'Europa continentale attraverso conquiste militari."
+                info: "Sotto Napoleone Bonaparte, la Francia stava espandendo il suo controllo."
             },
             {
                 id: 'prussia-1800',
                 name: "Regno di Prussia",
                 coordinates: [13.4050, 52.5200],
-                bounds: [[11, 50], [15, 54]],
+                polygon: [
+                    [14.0, 54.5], [9.0, 54.0], [7.0, 52.0], [10.0, 51.5],
+                    [12.0, 50.5], [14.5, 51.0], [15.0, 52.5], [14.5, 54.0], [14.0, 54.5]
+                ],
                 color: "#000000",
-                info: "La Prussia era un potente regno tedesco, precursore dell'unificazione tedesca del 1871."
+                info: "La Prussia era un potente regno tedesco."
             }
         ]
     },
@@ -43,33 +54,48 @@ const historicalData = {
                 id: 'austria-hungary-1914',
                 name: "Impero Austro-Ungarico",
                 coordinates: [16.3738, 48.2082],
-                bounds: [[13, 45], [22, 50]],
+                polygon: [
+                    [22.5, 49.0], [17.0, 49.5], [16.4, 48.2], [12.5, 47.0],
+                    [13.0, 46.0], [14.5, 45.5], [18.0, 44.5], [20.5, 45.0],
+                    [22.0, 46.5], [23.5, 48.0], [22.5, 49.0]
+                ],
                 color: "#FFD700",
-                info: "L'Impero Austro-Ungarico alla vigilia della Prima Guerra Mondiale. La monarchia duale controllava un vasto territorio multietnico."
+                info: "L'Impero Austro-Ungarico alla vigilia della Prima Guerra Mondiale."
             },
             {
                 id: 'germany-1914',
                 name: "Impero Tedesco",
                 coordinates: [13.4050, 52.5200],
-                bounds: [[6, 47], [15, 55]],
+                polygon: [
+                    [9.0, 55.0], [14.0, 54.5], [14.5, 53.0], [15.0, 50.5],
+                    [13.0, 48.0], [10.0, 47.5], [7.5, 47.5], [6.0, 49.0],
+                    [6.0, 51.0], [7.0, 53.5], [9.0, 55.0]
+                ],
                 color: "#000000",
-                info: "L'Impero Tedesco unificato sotto i Hohenzollern, principale potenza industriale e militare dell'Europa continentale."
+                info: "L'Impero Tedesco unificato sotto i Hohenzollern."
             },
             {
                 id: 'france-1914',
                 name: "Francia",
                 coordinates: [2.3522, 48.8566],
-                bounds: [[-5, 42], [8, 51]],
+                polygon: [
+                    [2.5, 51.0], [-1.5, 50.5], [-4.5, 48.5], [-2.0, 47.0],
+                    [-1.0, 43.5], [3.0, 43.0], [7.0, 42.5], [8.5, 44.0],
+                    [7.0, 45.5], [7.5, 47.5], [6.0, 49.0], [4.0, 50.0], [2.5, 51.0]
+                ],
                 color: "#0055A4",
-                info: "La Terza Repubblica Francese, rivale della Germania dopo la sconfitta del 1870. Alleata con Russia e Regno Unito."
+                info: "La Terza Repubblica Francese, rivale della Germania."
             },
             {
                 id: 'russia-1914',
                 name: "Impero Russo",
                 coordinates: [37.6173, 55.7558],
-                bounds: [[20, 50], [50, 70]],
+                polygon: [
+                    [30.0, 70.0], [180.0, 65.0], [180.0, 50.0], [150.0, 45.0],
+                    [40.0, 44.0], [28.0, 47.0], [25.0, 52.0], [28.0, 60.0], [30.0, 70.0]
+                ],
                 color: "#DA291C",
-                info: "L'Impero Russo degli zar Romanov, esteso dall'Europa all'Asia. Il più grande impero territoriale del tempo."
+                info: "L'Impero Russo degli zar Romanov."
             }
         ]
     },
@@ -81,25 +107,36 @@ const historicalData = {
                 id: 'germany-occupied-1945',
                 name: "Germania Occupata",
                 coordinates: [13.4050, 52.5200],
-                bounds: [[6, 47], [15, 55]],
+                polygon: [
+                    [9.0, 55.0], [14.0, 54.5], [14.5, 53.0], [15.0, 50.5],
+                    [13.0, 48.0], [10.0, 47.5], [7.5, 47.5], [6.0, 49.0],
+                    [6.0, 51.0], [7.0, 53.5], [9.0, 55.0]
+                ],
                 color: "#808080",
-                info: "Germania divisa in quattro zone di occupazione (USA, UK, Francia, URSS) dopo la sconfitta nazista."
+                info: "Germania divisa in quattro zone di occupazione."
             },
             {
                 id: 'france-1945',
                 name: "Francia Liberata",
                 coordinates: [2.3522, 48.8566],
-                bounds: [[-5, 42], [8, 51]],
+                polygon: [
+                    [2.5, 51.0], [-1.5, 50.5], [-4.5, 48.5], [-2.0, 47.0],
+                    [-1.0, 43.5], [3.0, 43.0], [7.0, 42.5], [8.5, 44.0],
+                    [7.0, 45.5], [7.5, 47.5], [6.0, 49.0], [4.0, 50.0], [2.5, 51.0]
+                ],
                 color: "#0055A4",
-                info: "La Francia liberata dagli Alleati nel 1944, membro vittorioso della coalizione anti-Asse."
+                info: "La Francia liberata dagli Alleati nel 1944."
             },
             {
                 id: 'soviet-union-1945',
                 name: "Unione Sovietica",
                 coordinates: [37.6173, 55.7558],
-                bounds: [[20, 45], [180, 70]],
+                polygon: [
+                    [30.0, 70.0], [180.0, 65.0], [180.0, 50.0], [150.0, 45.0],
+                    [40.0, 44.0], [25.0, 47.0], [22.0, 52.0], [28.0, 60.0], [30.0, 70.0]
+                ],
                 color: "#DA291C",
-                info: "L'URSS emerge come superpotenza dopo la vittoria sul nazismo, con influenza su tutta l'Europa orientale."
+                info: "L'URSS emerge come superpotenza."
             }
         ]
     },
@@ -111,25 +148,36 @@ const historicalData = {
                 id: 'germany-2024',
                 name: "Germania",
                 coordinates: [13.4050, 52.5200],
-                bounds: [[6, 47], [15, 55]],
+                polygon: [
+                    [9.0, 55.0], [14.0, 54.5], [14.5, 53.0], [15.0, 50.5],
+                    [13.0, 48.0], [10.0, 47.5], [7.5, 47.5], [6.0, 49.0],
+                    [6.0, 51.0], [7.0, 53.5], [9.0, 55.0]
+                ],
                 color: "#000000",
-                info: "Germania riunificata dal 1990, potenza economica dell'Unione Europea e leader dell'integrazione europea."
+                info: "Germania riunificata dal 1990."
             },
             {
                 id: 'france-2024',
                 name: "Francia",
                 coordinates: [2.3522, 48.8566],
-                bounds: [[-5, 42], [8, 51]],
+                polygon: [
+                    [2.5, 51.0], [-1.5, 50.5], [-4.5, 48.5], [-2.0, 47.0],
+                    [-1.0, 43.5], [3.0, 43.0], [7.0, 42.5], [8.5, 44.0],
+                    [7.0, 45.5], [7.5, 47.5], [6.0, 49.0], [4.0, 50.0], [2.5, 51.0]
+                ],
                 color: "#0055A4",
-                info: "Francia moderna, membro fondatore dell'UE, potenza nucleare e membro permanente del Consiglio di Sicurezza ONU."
+                info: "Francia moderna, membro fondatore dell'UE."
             },
             {
                 id: 'russia-2024',
                 name: "Federazione Russa",
                 coordinates: [37.6173, 55.7558],
-                bounds: [[20, 50], [180, 70]],
+                polygon: [
+                    [30.0, 70.0], [180.0, 65.0], [180.0, 50.0], [150.0, 45.0],
+                    [40.0, 44.0], [28.0, 47.0], [25.0, 52.0], [28.0, 60.0], [30.0, 70.0]
+                ],
                 color: "#0033A0",
-                info: "Federazione Russa dopo la dissoluzione dell'URSS nel 1991. Ancora la nazione più estesa del mondo."
+                info: "Federazione Russa dopo la dissoluzione dell'URSS."
             }
         ]
     }
@@ -141,7 +189,7 @@ function ChronoWorldApp() {
     const [mapLoaded, setMapLoaded] = useState(false);
     const mapContainer = useRef(null);
     const mapInstance = useRef(null);
-    const markersRef = useRef([]);
+    const territoriesLayerRef = useRef(null);
 
     const quickYears = [1800, 1914, 1945, 2024];
 
@@ -156,32 +204,36 @@ function ChronoWorldApp() {
     const closestYear = findClosestYear(currentYear);
     const currentData = historicalData[closestYear];
 
-    // Inizializza la mappa
+    // Inizializza la mappa con Leaflet
     useEffect(() => {
         if (mapInstance.current) return; // Mappa già inizializzata
 
-        // NOTA: Sostituisci con il tuo Mapbox token
-        mapboxgl.accessToken = 'pk.eyJ1IjoiZXhhbXBsZSIsImEiOiJjbGV4YW1wbGUifQ.example';
-        
         try {
-            mapInstance.current = new mapboxgl.Map({
-                container: mapContainer.current,
-                style: 'mapbox://styles/mapbox/dark-v11', // Stile dark elegante
-                center: [10.0, 50.0],
-                zoom: 3.5,
-                projection: 'mercator'
-            });
+            // Inizializza mappa Leaflet
+            mapInstance.current = L.map(mapContainer.current).setView([50.0, 10.0], 4);
 
-            mapInstance.current.on('load', () => {
-                setMapLoaded(true);
-            });
+            // Aggiungi tile layer SENZA confini moderni - solo geografia
+            // Usa mappa base neutra che mostra solo caratteristiche geografiche
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap, © CartoDB',
+                maxZoom: 19,
+                opacity: 0.5 // Trasparenza per far risaltare i confini storici
+            }).addTo(mapInstance.current);
+            
+            // OPZIONALE: Aggiungi solo nomi di città (senza confini moderni)
+            // L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}.png', {
+            //     attribution: '',
+            //     maxZoom: 19,
+            //     opacity: 0.3,
+            //     className: 'city-labels-only' // Mostra solo nomi principali
+            // }).addTo(mapInstance.current);
 
-            // Controlli di navigazione
-            mapInstance.current.addControl(new mapboxgl.NavigationControl());
-        } catch (error) {
-            console.error('Errore inizializzazione Mapbox:', error);
-            // Fallback: mostra messaggio
+            // Crea layer group per i territori
+            territoriesLayerRef.current = L.layerGroup().addTo(mapInstance.current);
+
             setMapLoaded(true);
+        } catch (error) {
+            console.error('Errore inizializzazione mappa:', error);
         }
 
         return () => {
@@ -191,46 +243,77 @@ function ChronoWorldApp() {
         };
     }, []);
 
-    // Aggiorna markers quando cambia l'anno
+    // Aggiorna poligoni quando cambia l'anno
     useEffect(() => {
-        if (!mapLoaded || !mapInstance.current) return;
+        if (!mapLoaded || !territoriesLayerRef.current) return;
 
-        // Rimuovi markers esistenti
-        markersRef.current.forEach(marker => marker.remove());
-        markersRef.current = [];
+        // Rimuovi tutti i layer esistenti
+        territoriesLayerRef.current.clearLayers();
 
-        // Aggiungi nuovi markers
+        // Aggiungi nuovi poligoni
         currentData.territories.forEach(territory => {
-            const el = document.createElement('div');
-            el.className = 'marker';
-            el.style.width = '30px';
-            el.style.height = '30px';
-            el.style.borderRadius = '50%';
-            el.style.backgroundColor = territory.color;
-            el.style.border = '3px solid white';
-            el.style.cursor = 'pointer';
-            el.style.boxShadow = '0 4px 10px rgba(0,0,0,0.5)';
-            el.style.transition = 'all 0.3s ease';
-
-            el.addEventListener('mouseenter', () => {
-                el.style.transform = 'scale(1.3)';
-                el.style.zIndex = '1000';
+            // Converti coordinate da [lng, lat] a [lat, lng] per Leaflet
+            const leafletCoords = territory.polygon.map(coord => [coord[1], coord[0]]);
+            
+            // Crea poligono
+            const polygon = L.polygon(leafletCoords, {
+                color: territory.color,
+                fillColor: territory.color,
+                fillOpacity: 0.5,
+                weight: 3,
+                opacity: 0.8
             });
 
-            el.addEventListener('mouseleave', () => {
-                el.style.transform = 'scale(1)';
+            // Aggiungi popup
+            polygon.bindPopup(`
+                <div style="font-family: sans-serif;">
+                    <h3 style="margin: 0 0 10px 0; color: ${territory.color};">
+                        ${territory.name}
+                    </h3>
+                    <p style="margin: 0; line-height: 1.6;">
+                        ${territory.info}
+                    </p>
+                </div>
+            `);
+
+            // Aggiungi tooltip
+            polygon.bindTooltip(territory.name, {
+                permanent: false,
+                direction: 'center'
             });
 
-            el.addEventListener('click', () => {
+            // Effetti hover
+            polygon.on('mouseover', function() {
+                this.setStyle({
+                    fillOpacity: 0.7,
+                    weight: 4
+                });
+            });
+
+            polygon.on('mouseout', function() {
+                this.setStyle({
+                    fillOpacity: 0.5,
+                    weight: 3
+                });
+            });
+
+            // Click per selezionare
+            polygon.on('click', () => {
                 setSelectedTerritory(territory);
+                
+                // Zoom sul territorio con animazione
+                mapInstance.current.fitBounds(polygon.getBounds(), {
+                    padding: [50, 50],
+                    maxZoom: 6,
+                    animate: true,
+                    duration: 1
+                });
             });
 
-            const marker = new mapboxgl.Marker(el)
-                .setLngLat(territory.coordinates)
-                .addTo(mapInstance.current);
-
-            markersRef.current.push(marker);
+            // Aggiungi al layer group
+            polygon.addTo(territoriesLayerRef.current);
         });
+
     }, [currentData, mapLoaded]);
 
     return (

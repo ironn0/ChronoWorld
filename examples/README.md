@@ -2,7 +2,17 @@
 
 Questo repository contiene **3 implementazioni complete** di ChronoWorld usando stack tecnologici diversi.
 
-## 📁 Struttura
+## �️ Mappe Disponibili
+
+Tutti gli esempi usano **mappe con stile muto/storico** perfette per visualizzare confini storici!
+
+- **Default**: CartoDB Positron (stile minimalista chiaro)
+- **Alternative**: Watercolor, Toner, Dark Matter, e altre
+- **100% Gratuite**: Nessuna API key richiesta (tranne Stamen via Stadia Maps)
+
+Vedi **[MAPPE-ALTERNATIVE.md](./MAPPE-ALTERNATIVE.md)** per la guida completa con tutti gli stili disponibili!
+
+## �📁 Struttura
 
 ```
 examples/

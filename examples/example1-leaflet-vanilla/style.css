@@ -70,6 +70,8 @@ header p {
 #map {
     height: 500px;
     width: 100%;
+    background: #f5f1e8; /* Colore carta antica come sfondo */
+    filter: sepia(0.05) contrast(1.05); /* Leggero effetto vintage */
 }
 
 .info-panel {

@@ -1,37 +1,36 @@
-# Esempio 2: Mapbox + React
+# Esempio 2: Leaflet + React (con Hooks)
 
 ## 🎯 Caratteristiche
 
-- **Stack**: Mapbox GL JS + React + Hooks
-- **Complessità**: ⭐⭐⭐⭐ (Media-Alta)
-- **Setup**: Richiede build (Vite/Webpack) o usa versione CDN
-- **Dimensione**: ~800KB (con React + Mapbox)
+- **Stack**: Leaflet.js + React 18 + Hooks
+- **Complessità**: ⭐⭐⭐ (Media)
+- **Setup**: Versione CDN pronta all'uso
+- **Dimensione**: ~400KB (con React + Leaflet)
+- **API Key**: ❌ Non necessaria (100% open source!)
 
 ## ✅ Pro
 
-- 🎨 Mappe 3D bellissime e performanti
-- ⚛️ Architettura React componibile
-- 🔄 Gestione stato reattiva con Hooks
+- � Completamente gratuito, nessuna API key
+- ⚛️ Architettura React componibile e moderna
+- 🔄 Gestione stato reattiva con Hooks (useState, useEffect, useRef)
 - 🎭 Animazioni fluide e transizioni
 - 📦 Ecosistema React vastissimo
 - 🧪 Testing con Jest/React Testing Library
 - 🏗️ Scalabile per app complesse
-- 🗺️ Supporto vettoriale e raster
+- 🗺️ Leaflet è maturo e stabile
 
 ## ❌ Contro
 
-- 💰 Mapbox richiede API key (free tier limitato)
-- 📦 Bundle size maggiore
-- 🔧 Setup più complesso (Node.js, build tools)
+-  Bundle size medio-grande
+- 🔧 Setup più complesso di vanilla JS
 - 📚 Curva di apprendimento React
-- 🐛 Debugging più complesso
+- 🎨 Grafica meno "wow" rispetto a Mapbox
 
 ## 🚀 Come Usare
 
-### Versione CDN (Semplice)
-1. Registrati su [Mapbox](https://www.mapbox.com/) per API key gratuita
-2. Sostituisci `YOUR_MAPBOX_TOKEN` in `app.jsx`
-3. Apri `index.html` nel browser
+### Versione CDN (Immediata) ✅
+1. Apri `index.html` nel browser
+2. **Funziona immediatamente, senza configurazione!**
 
 ### Versione con Build (Professionale)
 ```bash
@@ -39,26 +38,34 @@ npm install
 npm run dev
 ```
 
-## 🔑 Ottenere Mapbox API Key
-
-1. Vai su https://www.mapbox.com/
-2. Crea account gratuito
-3. Copia il token da Dashboard
-4. Free tier: 50.000 richieste/mese
-
 ## 💡 Ideale Per
 
 - Applicazioni web moderne
 - Progetti che cresceranno nel tempo
 - Team che conoscono React
-- Mappe con grafica avanzata
 - Quando serve un'architettura solida
-- Progetti commerciali/professionali
+- Progetti che non vogliono dipendenze esterne (API key)
+- Startup e progetti commerciali
 
 ## 🎓 Note Tecniche
 
-- React 18 con Hooks (useState, useEffect, useRef)
-- Mapbox GL JS v3 con stile dark
+- React 18 con Hooks moderni
+  - `useState` per stato locale
+  - `useEffect` per side effects
+  - `useRef` per riferimenti DOM
+- Leaflet.js per mappe interattive
+- Poligoni GeoJSON per confini storici
 - Responsive design
-- Markers custom interattivi
-- Gestione stato locale
+- Gestione eventi (hover, click)
+- Animazioni zoom automatico
+
+## 🔄 Migrazione a Mapbox (Opzionale)
+
+Se vuoi grafica più avanzata, puoi facilmente migrare a Mapbox:
+
+1. Registrati su https://www.mapbox.com/
+2. Ottieni API key gratuita
+3. Sostituisci Leaflet con Mapbox GL JS
+4. Aggiorna il codice in `app.jsx`
+
+**Nota**: Questo esempio usa Leaflet per evitare la necessità di API key e funzionare immediatamente!

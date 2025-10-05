@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Esempio 4: Dati Storici Reali - ChronoWorld</title>
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🗺️ ChronoWorld - Confini Storici Reali</h1>
+            <p>Dati autentici dal progetto Historical Basemaps (A. Ourednik)</p>
+        </header>
+
+        <div class="controls">
+            <label for="year-select">Seleziona Anno:</label>
+            <select id="year-select">
+                <option value="1900">1900</option>
+                <option value="1914" selected>1914 (Prima Guerra Mondiale)</option>
+            </select>
+            
+            <div class="info-box">
+                <strong>Visualizzazione:</strong> Confini politici storici autentici
+            </div>
+        </div>
+
+        <div id="map"></div>
+
+        <div id="territory-info" class="info-panel">
+            <h3>Informazioni Territorio</h3>
+            <div id="territory-details">
+                <p>Clicca su un territorio per vedere i dettagli</p>
+            </div>
+        </div>
+
+        <div class="legend">
+            <h4>📊 Statistiche</h4>
+            <div id="stats">
+                <p><strong>Stati visualizzati:</strong> <span id="state-count">0</span></p>
+                <p><strong>Anno:</strong> <span id="current-year">1914</span></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
