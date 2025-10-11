@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Esempio 4: Dati Storici Reali - ChronoWorld</title>
+    <title>ChronoWorld - CShapes Dataset Completo (1886-2019)</title>
     
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -13,51 +13,70 @@
 <body>
     <div class="container">
         <header>
-            <h1>🗺️ ChronoWorld - Confini Storici Reali</h1>
-            <p>Dati autentici dal progetto Historical Basemaps (A. Ourednik)</p>
+            <h1>🗺️ ChronoWorld - Confini Storici Mondiali</h1>
+            <p>Dataset CShapes 2.0: 1886-2019 | Tutti i cambiamenti di confine documentati</p>
         </header>
 
         <div class="controls">
-            <label for="year-select">Seleziona Anno:</label>
-            <select id="year-select">
-                <option value="1880">1880 - Era Coloniale</option>
-                <option value="1900">1900 - Fine XIX Secolo</option>
-                <option value="1914" selected>1914 - Prima Guerra Mondiale</option>
-                <option value="1920">1920 - Post WWI</option>
-                <option value="1945">1945 - Fine WWII</option>
-                <option value="1994">1994 - Post Guerra Fredda</option>
-            </select>
+            <div class="control-row">
+                <label for="year-select">📅 Seleziona Anno Storico:</label>
+                <select id="year-select">
+                    <optgroup label="📜 XIX Secolo">
+                        <option value="1886">1886 - Inizio Dataset</option>
+                        <option value="1890">1890</option>
+                        <option value="1900">1900 - Fine XIX Secolo</option>
+                    </optgroup>
+                    
+                    <optgroup label="⚔️ Prima Guerra Mondiale">
+                        <option value="1910">1910 - Pre-WWI</option>
+                        <option value="1914" selected>1914 - Inizio WWI</option>
+                        <option value="1918">1918 - Fine WWI</option>
+                        <option value="1920">1920 - Trattato Versailles</option>
+                    </optgroup>
+                    
+                    <optgroup label="🌍 Periodo Interbellico">
+                        <option value="1925">1925</option>
+                        <option value="1930">1930</option>
+                        <option value="1935">1935</option>
+                    </optgroup>
+                    
+                    <optgroup label="💥 Seconda Guerra Mondiale">
+                        <option value="1939">1939 - Inizio WWII</option>
+                        <option value="1942">1942 - Apice WWII</option>
+                        <option value="1945">1945 - Fine WWII</option>
+                    </optgroup>
+                    
+                    <optgroup label="❄️ Guerra Fredda">
+                        <option value="1950">1950 - Inizio Guerra Fredda</option>
+                        <option value="1960">1960 - Decolonizzazione</option>
+                        <option value="1970">1970</option>
+                        <option value="1980">1980</option>
+                        <option value="1989">1989 - Caduta Muro</option>
+                        <option value="1991">1991 - Fine URSS</option>
+                    </optgroup>
+                    
+                    <optgroup label="🌏 Era Contemporanea">
+                        <option value="2000">2000 - Nuovo Millennio</option>
+                        <option value="2010">2010</option>
+                        <option value="2019">2019 - Dati Più Recenti</option>
+                    </optgroup>
+                </select>
+            </div>
             
-            <label class="checkbox-container">
-                <input type="checkbox" id="show-labels" checked>
-                <span>Mostra Etichette Paesi</span>
-            </label>
+            <div class="control-row">
+                <label class="checkbox-container">
+                    <input type="checkbox" id="show-labels" checked>
+                    <span>🏷️ Mostra Nomi Paesi</span>
+                </label>
+                
+                <label class="checkbox-container">
+                    <input type="checkbox" id="show-capitals" checked>
+                    <span>⭐ Mostra Capitali</span>
+                </label>
+            </div>
             
-            <div class="info-box">
-                <strong>Visualizzazione:</strong> Confini politici storici autentici
-            </div>
-        </div>
-
-        <div id="map"></div>
-
-        <div id="territory-info" class="info-panel">
-            <h3>Informazioni Territorio</h3>
-            <div id="territory-details">
-                <p>Clicca su un territorio per vedere i dettagli</p>
-            </div>
-        </div>
-
-        <div class="legend">
-            <h4>📊 Statistiche</h4>
-            <div id="stats">
-                <p><strong>Stati visualizzati:</strong> <span id="state-count">0</span></p>
-                <p><strong>Anno:</strong> <span id="current-year">1914</span></p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Leaflet JS -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="script.js"></script>
-</body>
-</html>
+            <!-- Slider Timeline -->
+            <div class="year-slider-wrapper">
+                <label for="year-slider">🎚️ Esplora Timeline (1886-2019):</label>
+                <div class="slider-container">
+                    <span class="year-label

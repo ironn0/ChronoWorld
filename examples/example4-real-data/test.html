@@ -3,93 +3,325 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Test Rapido - ChronoWorld</title>
+    <title>Test CShapes - ChronoWorld</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
-        body { margin: 0; padding: 0; font-family: Arial, sans-serif; }
-        #map { height: 100vh; width: 100%; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+        }
+        h1 { margin-bottom: 20px; text-align: center; }
+        
+        #console {
+            background: #34495e;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+        
+        .log-entry {
+            padding: 5px;
+            border-left: 3px solid #3498db;
+            margin-bottom: 5px;
+            padding-left: 10px;
+        }
+        
+        .log-success { border-left-color: #2ecc71; color: #2ecc71; }
+        .log-error { border-left-color: #e74c3c; color: #e74c3c; }
+        .log-warning { border-left-color: #f39c12; color: #f39c12; }
+        
+        #map { 
+            height: 70vh; 
+            width: 100%; 
+            border-radius: 10px; 
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            background: white;
+        }
+        
         .loading {
-            position: absolute;
+            position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
             z-index: 9999;
             background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            color: #2c3e50;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            text-align: center;
+        }
+        
+        .spinner {
+            border: 5px solid #ecf0f1;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        #status { 
+            color: #7f8c8d; 
+            font-size: 1em; 
+            margin-top: 10px;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
-    <div id="loading" class="loading">
-        <h2>🌍 Caricamento mappa...</h2>
-        <p id="status">Inizializzazione...</p>
+    <h1>🧪 Test CShapes Dataset</h1>
+    
+    <div id="console">
+        <div class="log-entry">🚀 Inizializzazione test...</div>
     </div>
+    
+    <div id="loading" class="loading">
+        <div class="spinner"></div>
+        <h2>Caricamento CShapes...</h2>
+        <p id="status">Preparazione...</p>
+    </div>
+    
     <div id="map"></div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
+        const consoleEl = document.getElementById('console');
         const statusEl = document.getElementById('status');
         const loadingEl = document.getElementById('loading');
-
-        // 1. Crea mappa
-        statusEl.textContent = 'Creazione mappa...';
-        console.log('✅ Creazione mappa');
-        const map = L.map('map').setView([50, 10], 4);
-
-        // 2. Aggiungi tile layer
-        statusEl.textContent = 'Caricamento mappa base...';
-        console.log('✅ Aggiunta tile layer');
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png', {
-            attribution: '© OpenStreetMap © CARTO',
-            maxZoom: 20,
-            opacity: 0.6
-        }).addTo(map);
-
-        // 3. Carica GeoJSON
-        statusEl.textContent = 'Caricamento dati storici... (~1.5 MB)';
-        console.log('✅ Inizio fetch GeoJSON');
         
-        fetch('../../data/world_1914.geojson')
-            .then(response => {
-                console.log('✅ Response ricevuta:', response.status);
+        function log(message, type = 'info') {
+            const entry = document.createElement('div');
+            entry.className = `log-entry log-${type}`;
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            consoleEl.appendChild(entry);
+            consoleEl.scrollTop = consoleEl.scrollHeight;
+            console.log(message);
+        }
+        
+        function updateStatus(msg) {
+            statusEl.textContent = msg;
+        }
+
+        // =====================================
+        // TEST 1: Inizializzazione Mappa
+        // =====================================
+        updateStatus('Test 1/5: Creazione mappa...');
+        log('📍 Test 1: Inizializzazione mappa Leaflet', 'info');
+        
+        let map;
+        try {
+            map = L.map('map', {
+                center: [30, 10],
+                zoom: 3,
+                minZoom: 2,
+                maxZoom: 18
+            });
+            log('✅ Mappa inizializzata con successo', 'success');
+        } catch (error) {
+            log(`❌ Errore creazione mappa: ${error.message}`, 'error');
+        }
+
+        // =====================================
+        // TEST 2: Tile Layer
+        // =====================================
+        updateStatus('Test 2/5: Caricamento tile layer...');
+        log('🗺️ Test 2: Aggiunta tile layer OpenStreetMap', 'info');
+        
+        try {
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors',
+                maxZoom: 19
+            }).addTo(map);
+            log('✅ Tile layer caricato', 'success');
+        } catch (error) {
+            log(`❌ Errore tile layer: ${error.message}`, 'error');
+        }
+
+        // =====================================
+        // TEST 3: Caricamento File
+        // =====================================
+        updateStatus('Test 3/5: Ricerca file CShapes...');
+        log('📂 Test 3: Tentativo caricamento CShapes-2.0.geojson', 'info');
+        
+        const possiblePaths = [
+            '../../data/CShapes-2.0.geojson',
+            '../data/CShapes-2.0.geojson',
+            'CShapes-2.0.geojson',
+            '/data/CShapes-2.0.geojson'
+        ];
+        
+        async function tryLoadFromPath(path) {
+            log(`🔍 Tentativo: ${path}`, 'info');
+            
+            try {
+                const response = await fetch(path);
+                log(`   📡 HTTP Status: ${response.status} ${response.statusText}`, 
+                    response.ok ? 'success' : 'error');
+                
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}`);
                 }
-                statusEl.textContent = 'Parsing dati...';
-                return response.json();
-            })
-            .then(geojson => {
-                console.log('✅ GeoJSON parsato:', geojson.features.length, 'paesi');
-                statusEl.textContent = 'Rendering mappa...';
                 
-                // 4. Aggiungi alla mappa
-                L.geoJSON(geojson, {
-                    style: {
-                        fillColor: '#4ECDC4',
-                        weight: 2,
-                        opacity: 1,
-                        color: '#333',
-                        fillOpacity: 0.6
+                return { success: true, response, path };
+            } catch (error) {
+                log(`   ❌ Fallito: ${error.message}`, 'error');
+                return { success: false, error };
+            }
+        }
+        
+        async function loadCShapes() {
+            let loadedData = null;
+            let workingPath = null;
+            
+            // Prova tutti i percorsi
+            for (const path of possiblePaths) {
+                const result = await tryLoadFromPath(path);
+                
+                if (result.success) {
+                    log(`✅ FILE TROVATO: ${result.path}`, 'success');
+                    workingPath = result.path;
+                    
+                    // =====================================
+                    // TEST 4: Parsing JSON
+                    // =====================================
+                    updateStatus('Test 4/5: Parsing JSON...');
+                    log('⏳ Test 4: Parsing dati GeoJSON', 'info');
+                    
+                    try {
+                        const data = await result.response.json();
+                        log(`✅ JSON parsato con successo`, 'success');
+                        log(`   📊 Type: ${data.type}`, 'success');
+                        log(`   📦 Features: ${data.features.length}`, 'success');
+                        
+                        // Mostra prima feature
+                        const first = data.features[0];
+                        log(`   🔬 Prima feature properties:`, 'info');
+                        Object.keys(first.properties).slice(0, 5).forEach(key => {
+                            log(`      • ${key}: ${first.properties[key]}`, 'info');
+                        });
+                        
+                        loadedData = data;
+                        break;
+                        
+                    } catch (parseError) {
+                        log(`❌ Errore parsing JSON: ${parseError.message}`, 'error');
+                    }
+                }
+            }
+            
+            if (!loadedData) {
+                log('❌ NESSUN PERCORSO FUNZIONANTE', 'error');
+                log('', 'error');
+                log('📋 VERIFICA:', 'warning');
+                log('   1. File esiste: ChronoWorld/data/CShapes-2.0.geojson', 'warning');
+                log('   2. Stai usando Live Server (non file://)', 'warning');
+                log('   3. Percorso relativo corretto', 'warning');
+                
+                updateStatus('❌ ERRORE - File non trovato');
+                setTimeout(() => {
+                    loadingEl.style.display = 'none';
+                }, 2000);
+                return;
+            }
+            
+            // =====================================
+            // TEST 5: Visualizzazione Anno 1914
+            // =====================================
+            updateStatus('Test 5/5: Filtraggio anno 1914...');
+            log('🎯 Test 5: Filtraggio e visualizzazione anno 1914', 'info');
+            
+            try {
+                const filtered = loadedData.features.filter(f => {
+                    const props = f.properties;
+                    const start = props.GWSYEAR || props.gwsyear || 0;
+                    const end = props.GWEYEAR || props.gweyear || 9999;
+                    return start <= 1914 && end >= 1914;
+                });
+                
+                log(`✅ Filtrati ${filtered.length} stati per anno 1914`, 'success');
+                
+                if (filtered.length === 0) {
+                    log('⚠️ WARNING: Nessuno stato trovato per 1914', 'warning');
+                    log('   Controlla i nomi dei campi nel dataset', 'warning');
+                }
+                
+                // Visualizza sulla mappa
+                const geojsonLayer = L.geoJSON({
+                    type: 'FeatureCollection',
+                    features: filtered
+                }, {
+                    style: function(feature) {
+                        return {
+                            fillColor: '#3498db',
+                            weight: 1.5,
+                            opacity: 1,
+                            color: '#2c3e50',
+                            fillOpacity: 0.7
+                        };
                     },
-                    onEachFeature: (feature, layer) => {
-                        const name = feature.properties.NAME || 'Sconosciuto';
-                        layer.bindPopup(`<strong>${name}</strong><br>Anno: 1914`);
+                    onEachFeature: function(feature, layer) {
+                        const props = feature.properties;
+                        const name = props.CNTRY_NAME || props.NAME || 'Unknown';
+                        const code = props.GWCODE || props.gwcode || 'N/A';
+                        const cap = props.CAPNAME || props.capname || 'N/A';
+                        
+                        layer.bindPopup(`
+                            <strong>${name}</strong><br>
+                            Codice GW: ${code}<br>
+                            Capitale: ${cap}<br>
+                            Anno: 1914
+                        `);
+                        
+                        layer.on('mouseover', function(e) {
+                            e.target.setStyle({
+                                weight: 3,
+                                color: '#e74c3c',
+                                fillOpacity: 0.9
+                            });
+                        });
+                        
+                        layer.on('mouseout', function(e) {
+                            geojsonLayer.resetStyle(e.target);
+                        });
                     }
                 }).addTo(map);
-
-                console.log('✅ Mappa renderizzata!');
-                loadingEl.remove();
-            })
-            .catch(error => {
-                console.error('❌ Errore:', error);
-                statusEl.innerHTML = `
-                    <span style="color: red;">❌ Errore: ${error.message}</span><br>
-                    <small>Verifica che il file world_1914.geojson esista in data/</small><br>
-                    <small>Server attivo su http://localhost:8000</small>
-                `;
-            });
+                
+                log('✅ Layer aggiunto alla mappa', 'success');
+                log('', 'success');
+                log('🎉 TUTTI I TEST COMPLETATI CON SUCCESSO!', 'success');
+                log(`   • Percorso funzionante: ${workingPath}`, 'success');
+                log(`   • Stati visualizzati: ${filtered.length}`, 'success');
+                log(`   • Prova a cliccare sui paesi!`, 'success');
+                
+                updateStatus('✅ TEST SUPERATI!');
+                
+                // Nascondi loading dopo 2 secondi
+                setTimeout(() => {
+                    loadingEl.style.display = 'none';
+                }, 2000);
+                
+            } catch (vizError) {
+                log(`❌ Errore visualizzazione: ${vizError.message}`, 'error');
+                updateStatus('❌ ERRORE visualizzazione');
+            }
+        }
+        
+        // Avvia test
+        loadCShapes();
     </script>
 </body>
 </html>

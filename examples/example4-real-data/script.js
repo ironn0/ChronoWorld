@@ -1,266 +1,454 @@
-// Inizializza la mappa
-const map = L.map('map').setView([50, 10], 4);
+// ========================================
+// 🌍 CHRONOWORLD - Versione Funzionante
+// ========================================
 
-// Tile layer con mappa storica (senza confini moderni)
-L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png', {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-    subdomains: 'abcd',
-    maxZoom: 20,
-    opacity: 0.6
-}).addTo(map);
+console.log('🚀 ChronoWorld Starting...');
 
 // Variabili globali
+let map;
+let allData = null;
+let currentYear = 1914;
 let currentLayer = null;
-let labelsLayer = null;
-let currentYear = '1914';
+let capitalMarkers = [];
+let countryLabels = [];
 let showLabels = true;
+let showCapitals = true;
 
-// Mappa dei colori per ogni stato (generati dinamicamente)
-const colorMap = new Map();
-const colors = [
-    '#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8',
-    '#F7DC6F', '#BB8FCE', '#85C1E2', '#F8B88B', '#AAB7B8',
-    '#52BE80', '#AF7AC5', '#5DADE2', '#F4D03F', '#EB984E'
-];
-let colorIndex = 0;
+// ========================================
+// INIZIALIZZAZIONE MAPPA
+// ========================================
 
-// Funzione per ottenere un colore univoco per ogni stato
-function getColorForState(stateName) {
-    if (!colorMap.has(stateName)) {
-        colorMap.set(stateName, colors[colorIndex % colors.length]);
-        colorIndex++;
-    }
-    return colorMap.get(stateName);
+function initMap() {
+    console.log('📍 Inizializzazione mappa...');
+    
+    map = L.map('map', {
+        center: [30, 10],
+        zoom: 3,
+        minZoom: 2,
+        maxZoom: 18
+    });
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors',
+        maxZoom: 19
+    }).addTo(map);
+    
+    console.log('✅ Mappa inizializzata');
 }
 
-// Funzione per calcolare il centroide di un poligono
-function getPolygonCenter(coordinates) {
-    let lats = [];
-    let lngs = [];
-    
-    // Gestisce sia Polygon che MultiPolygon
-    function extractCoords(coords, depth = 0) {
-        if (depth === 2) {
-            coords.forEach(point => {
-                lngs.push(point[0]);
-                lats.push(point[1]);
-            });
-        } else {
-            coords.forEach(c => extractCoords(c, depth + 1));
-        }
-    }
-    
-    extractCoords(coordinates);
-    
-    const avgLat = lats.reduce((a, b) => a + b, 0) / lats.length;
-    const avgLng = lngs.reduce((a, b) => a + b, 0) / lngs.length;
-    
-    return [avgLat, avgLng];
-}
+// ========================================
+// CARICAMENTO DATASET - IDENTICO A TEST.HTML
+// ========================================
 
-// Funzione per calcolare l'area approssimativa (per dimensionare le etichette)
-function getApproximateArea(coordinates) {
-    let area = 0;
+async function loadCShapesDataset() {
+    showLoading('Caricamento CShapes 2.0...');
     
-    function calculatePolygonArea(coords) {
-        if (!coords || coords.length < 3) return 0;
-        let sum = 0;
-        for (let i = 0; i < coords.length - 1; i++) {
-            sum += (coords[i][0] * coords[i + 1][1] - coords[i + 1][0] * coords[i][1]);
-        }
-        return Math.abs(sum / 2);
-    }
+    const possiblePaths = [
+        '../../data/CShapes-2.0.geojson',
+        '../data/CShapes-2.0.geojson',
+        'CShapes-2.0.geojson',
+        '/data/CShapes-2.0.geojson'
+    ];
     
-    function processCoords(coords, depth = 0) {
-        if (depth === 2) {
-            area += calculatePolygonArea(coords);
-        } else {
-            coords.forEach(c => processCoords(c, depth + 1));
-        }
-    }
+    console.log('📂 Ricerca file CShapes...');
     
-    processCoords(coordinates);
-    return area;
-}
-
-// Funzione per creare le etichette dei paesi
-function createLabels(geojsonData) {
-    // Rimuovi le etichette precedenti
-    if (labelsLayer) {
-        map.removeLayer(labelsLayer);
-    }
-    
-    if (!showLabels) return;
-    
-    const markers = [];
-    
-    geojsonData.features.forEach(feature => {
-        const name = feature.properties.NAME || feature.properties.ABBREVN || 'Unknown';
-        const geometry = feature.geometry;
-        
-        if (!geometry || !geometry.coordinates) return;
-        
+    for (const path of possiblePaths) {
         try {
-            const center = getPolygonCenter(geometry.coordinates);
-            const area = getApproximateArea(geometry.coordinates);
+            console.log(`🔍 Tentativo: ${path}`);
             
-            // Determina la dimensione dell'etichetta in base all'area
-            let labelClass = 'country-label';
-            if (area < 10) {
-                labelClass += ' small';
-            } else if (area > 500) {
-                labelClass += ' large';
+            const response = await fetch(path);
+            console.log(`   📡 HTTP ${response.status} ${response.statusText}`);
+            
+            if (!response.ok) {
+                continue;
             }
             
-            // Abbrevia nomi molto lunghi
-            let displayName = name;
-            if (name.length > 20) {
-                displayName = feature.properties.ABBREVN || name.substring(0, 17) + '...';
-            }
+            console.log(`✅ FILE TROVATO: ${path}`);
+            console.log('⏳ Parsing JSON...');
             
-            const label = L.marker(center, {
-                icon: L.divIcon({
-                    className: labelClass,
-                    html: displayName,
-                    iconSize: null
-                }),
-                interactive: false
+            const data = await response.json();
+            
+            console.log(`✅ JSON parsato`);
+            console.log(`   📦 Features: ${data.features.length}`);
+            
+            allData = data;
+            
+            // Prima feature per debug
+            const first = data.features[0];
+            console.log('🔬 Sample properties:', Object.keys(first.properties).slice(0, 5));
+            
+            filterAndDisplayYear(currentYear);
+            hideLoading();
+            return;
+            
+        } catch (error) {
+            console.log(`   ❌ Errore: ${error.message}`);
+            continue;
+        }
+    }
+    
+    // Nessun percorso funzionante
+    console.error('❌ FILE NON TROVATO');
+    hideLoading();
+    alert('Impossibile caricare CShapes-2.0.geojson\n\nVerifica:\n1. File in ChronoWorld/data/\n2. Live Server attivo\n3. Console (F12) per dettagli');
+}
+
+// ========================================
+// FILTRAGGIO ANNO - IDENTICO A TEST.HTML
+// ========================================
+
+function filterAndDisplayYear(year) {
+    if (!allData) {
+        console.error('❌ Dataset non caricato');
+        return;
+    }
+    
+    console.log(`📅 Filtraggio anno ${year}...`);
+    showLoading(`Filtraggio anno ${year}...`);
+    
+    // Rimuovi layer precedente
+    if (currentLayer) {
+        map.removeLayer(currentLayer);
+    }
+    
+    // Rimuovi marker
+    capitalMarkers.forEach(m => map.removeLayer(m));
+    capitalMarkers = [];
+    
+    // Rimuovi label
+    countryLabels.forEach(l => map.removeLayer(l));
+    countryLabels = [];
+    
+    // FILTRA - IDENTICO A TEST.HTML
+    const filtered = allData.features.filter(f => {
+        const props = f.properties;
+        const start = props.GWSYEAR || props.gwsyear || 0;
+        const end = props.GWEYEAR || props.gweyear || 9999;
+        return start <= year && end >= year;
+    });
+    
+    console.log(`✅ Anno ${year}: ${filtered.length} stati`);
+    
+    if (filtered.length === 0) {
+        console.warn('⚠️ Nessuno stato trovato');
+        hideLoading();
+        return;
+    }
+    
+    // VISUALIZZA - IDENTICO A TEST.HTML
+    currentLayer = L.geoJSON({
+        type: 'FeatureCollection',
+        features: filtered
+    }, {
+        style: function(feature) {
+            const colors = [
+                '#3498db', '#2ecc71', '#e74c3c', '#f39c12', 
+                '#9b59b6', '#1abc9c', '#e67e22', '#34495e'
+            ];
+            const code = feature.properties.GWCODE || feature.properties.gwcode || 0;
+            const colorIndex = code % colors.length;
+            
+            return {
+                fillColor: colors[colorIndex],
+                weight: 1.5,
+                opacity: 1,
+                color: '#2c3e50',
+                fillOpacity: 0.7
+            };
+        },
+        onEachFeature: function(feature, layer) {
+            const props = feature.properties;
+            const name = props.CNTRY_NAME || props.NAME || 'Unknown';
+            const code = props.GWCODE || props.gwcode || 'N/A';
+            const cap = props.CAPNAME || props.capname || 'N/A';
+            
+            layer.bindPopup(`
+                <div class="country-popup">
+                    <h4>${name}</h4>
+                    <p><strong>Codice GW:</strong> ${code}</p>
+                    <p><strong>Capitale:</strong> ${cap}</p>
+                    <p><strong>Anno:</strong> ${year}</p>
+                </div>
+            `);
+            
+            // Hover
+            layer.on('mouseover', function(e) {
+                e.target.setStyle({
+                    weight: 3,
+                    color: '#e74c3c',
+                    fillOpacity: 0.9
+                });
             });
             
-            markers.push(label);
-        } catch (error) {
-            console.warn(`Impossibile creare etichetta per ${name}:`, error);
+            layer.on('mouseout', function(e) {
+                currentLayer.resetStyle(e.target);
+            });
+            
+            // Click
+            layer.on('click', function() {
+                showCountryDetails(props);
+            });
+        }
+    }).addTo(map);
+    
+    console.log('✅ Layer aggiunto');
+    
+    // Capitali
+    if (showCapitals) {
+        addCapitalMarkers(filtered);
+    }
+    
+    // Labels
+    if (showLabels) {
+        addCountryLabels(filtered);
+    }
+    
+    // Stats
+    updateStatistics(filtered);
+    
+    hideLoading();
+}
+
+// ========================================
+// CAPITALI
+// ========================================
+
+function addCapitalMarkers(features) {
+    let added = 0;
+    
+    features.forEach(f => {
+        const p = f.properties;
+        const lat = p.CAPLAT || p.caplat;
+        const lon = p.CAPLONG || p.caplong;
+        const name = p.CAPNAME || p.capname;
+        
+        if (lat && lon && name) {
+            const marker = L.circleMarker([lat, lon], {
+                radius: 5,
+                fillColor: '#e74c3c',
+                color: '#fff',
+                weight: 2,
+                opacity: 1,
+                fillOpacity: 0.8
+            }).addTo(map);
+            
+            marker.bindTooltip(name, {
+                permanent: false,
+                direction: 'top',
+                className: 'capital-tooltip'
+            });
+            
+            capitalMarkers.push(marker);
+            added++;
         }
     });
     
-    labelsLayer = L.layerGroup(markers).addTo(map);
-    console.log(`✅ Creato ${markers.length} etichette`);
+    console.log(`✅ ${added} capitali aggiunte`);
 }
 
-// Funzione per caricare e visualizzare i dati storici
-async function loadHistoricalData(year) {
-    try {
-        // Mostra loading
-        const mapDiv = document.getElementById('map');
-        const loadingDiv = document.createElement('div');
-        loadingDiv.className = 'loading';
-        loadingDiv.innerHTML = '<div class="spinner"></div>Caricamento dati storici...';
-        mapDiv.appendChild(loadingDiv);
+// ========================================
+// LABELS
+// ========================================
 
-        // Rimuovi il layer precedente
-        if (currentLayer) {
-            map.removeLayer(currentLayer);
-        }
-
-        // Carica il file GeoJSON
-        const response = await fetch(`../../data/world_${year}.geojson`);
-        if (!response.ok) {
-            throw new Error(`Errore nel caricamento: ${response.status}`);
-        }
-        
-        const geojsonData = await response.json();
-        
-        // Rimuovi loading
-        mapDiv.removeChild(loadingDiv);
-
-        // Aggiungi il layer GeoJSON alla mappa
-        currentLayer = L.geoJSON(geojsonData, {
-            style: function(feature) {
-                const stateName = feature.properties.NAME;
-                return {
-                    fillColor: getColorForState(stateName),
-                    weight: 2,
-                    opacity: 1,
-                    color: '#333',
-                    fillOpacity: 0.6
-                };
-            },
-            onEachFeature: function(feature, layer) {
-                const props = feature.properties;
-                const stateName = props.NAME || 'Sconosciuto';
-                const subjectTo = props.SUBJECTO || 'Indipendente';
-                const partOf = props.PARTOF || stateName;
-                
-                // Popup con informazioni
-                layer.bindPopup(`
-                    <h4>${stateName}</h4>
-                    <p><strong>Subordinato a:</strong> ${subjectTo}</p>
-                    <p><strong>Parte di:</strong> ${partOf}</p>
-                    <p><strong>Anno:</strong> ${year}</p>
-                `);
-                
-                // Hover effect
-                layer.on('mouseover', function(e) {
-                    e.target.setStyle({
-                        weight: 3,
-                        fillOpacity: 0.8
-                    });
-                });
-                
-                layer.on('mouseout', function(e) {
-                    currentLayer.resetStyle(e.target);
-                });
-                
-                // Click event
-                layer.on('click', function() {
-                    document.getElementById('territory-details').innerHTML = `
-                        <p><strong>Nome:</strong> ${stateName}</p>
-                        <p><strong>Subordinato a:</strong> ${subjectTo}</p>
-                        <p><strong>Parte di:</strong> ${partOf}</p>
-                        <p><strong>Anno:</strong> ${year}</p>
-                        <p><strong>Precisione confini:</strong> ${props.BORDERPRECISION}/5</p>
-                    `;
-                });
-            }
-        }).addTo(map);
-
-        // Aggiorna statistiche
-        const stateCount = geojsonData.features.length;
-        document.getElementById('state-count').textContent = stateCount;
-        document.getElementById('current-year').textContent = year;
-        
-        // Crea le etichette dei paesi
-        createLabels(geojsonData);
-        
-        console.log(`✅ Caricati ${stateCount} stati per l'anno ${year}`);
-        
-    } catch (error) {
-        console.error('❌ Errore nel caricamento dei dati:', error);
-        
-        // Mostra messaggio più user-friendly
-        const errorMsg = document.createElement('div');
-        errorMsg.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #f8d7da; color: #721c24; padding: 20px; border-radius: 8px; border: 2px solid #f5c6cb; z-index: 9999; max-width: 500px;';
-        errorMsg.innerHTML = `
-            <h3>⚠️ Dati non disponibili</h3>
-            <p>Il file <strong>world_${year}.geojson</strong> non è stato trovato.</p>
-            <p>Anni disponibili: 1900, 1914</p>
-            <button onclick="this.parentElement.remove()" style="margin-top: 10px; padding: 8px 16px; cursor: pointer;">Chiudi</button>
-        `;
-        document.body.appendChild(errorMsg);
-    }
-}
-
-// Event listener per il cambio anno
-document.getElementById('year-select').addEventListener('change', function(e) {
-    currentYear = e.target.value;
-    loadHistoricalData(currentYear);
-});
-
-// Event listener per mostrare/nascondere etichette
-document.getElementById('show-labels').addEventListener('change', function(e) {
-    showLabels = e.target.checked;
+function addCountryLabels(features) {
+    let added = 0;
     
-    if (showLabels) {
-        // Ricarica i dati per ricreare le etichette
-        loadHistoricalData(currentYear);
-    } else {
-        // Rimuovi le etichette
-        if (labelsLayer) {
-            map.removeLayer(labelsLayer);
-            labelsLayer = null;
+    features.forEach(f => {
+        if (f.geometry) {
+            let coords;
+            
+            if (f.geometry.type === 'MultiPolygon') {
+                coords = f.geometry.coordinates[0][0];
+            } else if (f.geometry.type === 'Polygon') {
+                coords = f.geometry.coordinates[0];
+            }
+            
+            if (coords && coords.length > 0) {
+                const avgLon = coords.reduce((sum, c) => sum + c[0], 0) / coords.length;
+                const avgLat = coords.reduce((sum, c) => sum + c[1], 0) / coords.length;
+                
+                const name = f.properties.CNTRY_NAME || 
+                           f.properties.cntry_name || 
+                           f.properties.NAME || 
+                           f.properties.name || '';
+                
+                if (name) {
+                    const label = L.marker([avgLat, avgLon], {
+                        icon: L.divIcon({
+                            className: 'country-label',
+                            html: name,
+                            iconSize: [100, 20]
+                        })
+                    }).addTo(map);
+                    
+                    countryLabels.push(label);
+                    added++;
+                }
+            }
         }
+    });
+    
+    console.log(`✅ ${added} etichette aggiunte`);
+}
+
+// ========================================
+// DETTAGLI PAESE
+// ========================================
+
+function showCountryDetails(props) {
+    const div = document.getElementById('territory-details');
+    if (!div) return;
+    
+    const name = props.CNTRY_NAME || props.NAME || 'Sconosciuto';
+    const code = props.GWCODE || props.gwcode || 'N/A';
+    const iso = props.ISO1AL3 || props.iso1al3 || 'N/A';
+    const cap = props.CAPNAME || props.capname || 'N/A';
+    const lat = props.CAPLAT || props.caplat || 0;
+    const lon = props.CAPLONG || props.caplong || 0;
+    const start = props.GWSYEAR || props.gwsyear || '?';
+    const end = props.GWEYEAR || props.gweyear || '?';
+    const area = props.AREA || props.area || 0;
+    
+    div.innerHTML = `
+        <h4>${name}</h4>
+        <hr>
+        <p><strong>Codice GW:</strong> ${code}</p>
+        <p><strong>ISO:</strong> ${iso}</p>
+        <p><strong>Capitale:</strong> ${cap}</p>
+        <p><strong>Coordinate:</strong> ${lat.toFixed(2)}°N, ${lon.toFixed(2)}°E</p>
+        <p><strong>Periodo:</strong> ${start} - ${end}</p>
+        <p><strong>Area:</strong> ${formatArea(area)} km²</p>
+    `;
+}
+
+// ========================================
+// STATISTICHE
+// ========================================
+
+function updateStatistics(features) {
+    const total = features.length;
+    const area = features.reduce((sum, f) => sum + (f.properties.AREA || f.properties.area || 0), 0);
+    const caps = features.filter(f => f.properties.CAPNAME || f.properties.capname).length;
+    
+    const stateCount = document.getElementById('state-count');
+    const totalArea = document.getElementById('total-area');
+    const capCount = document.getElementById('capital-count');
+    const currYear = document.getElementById('current-year');
+    
+    if (stateCount) stateCount.textContent = total;
+    if (totalArea) totalArea.textContent = formatArea(area);
+    if (capCount) capCount.textContent = caps;
+    if (currYear) currYear.textContent = currentYear;
+}
+
+// ========================================
+// UTILITY
+// ========================================
+
+function formatArea(area) {
+    if (!area || area === 0) return 'N/A';
+    return new Intl.NumberFormat('it-IT', {
+        maximumFractionDigits: 0
+    }).format(area);
+}
+
+function showLoading(text = 'Caricamento...') {
+    const overlay = document.getElementById('loading-overlay');
+    const textEl = document.getElementById('loading-text');
+    if (overlay) overlay.style.display = 'flex';
+    if (textEl) textEl.textContent = text;
+}
+
+function hideLoading() {
+    const overlay = document.getElementById('loading-overlay');
+    if (overlay) overlay.style.display = 'none';
+}
+
+// ========================================
+// EVENT LISTENERS
+// ========================================
+
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🎬 DOM Ready');
+    
+    initMap();
+    loadCShapesDataset();
+    
+    // Dropdown anno
+    const yearSelect = document.getElementById('year-select');
+    if (yearSelect) {
+        yearSelect.addEventListener('change', function(e) {
+            currentYear = parseInt(e.target.value);
+            const slider = document.getElementById('year-slider');
+            const display = document.getElementById('slider-year');
+            if (slider) slider.value = currentYear;
+            if (display) display.textContent = currentYear;
+            filterAndDisplayYear(currentYear);
+        });
+    }
+    
+    // Slider
+    const yearSlider = document.getElementById('year-slider');
+    if (yearSlider) {
+        let timeout;
+        yearSlider.addEventListener('input', function(e) {
+            currentYear = parseInt(e.target.value);
+            const display = document.getElementById('slider-year');
+            if (display) display.textContent = currentYear;
+            
+            clearTimeout(timeout);
+            timeout = setTimeout(() => {
+                if (yearSelect) {
+                    const options = Array.from(yearSelect.options);
+                    const closest = options.reduce((p, c) => {
+                        return Math.abs(parseInt(c.value) - currentYear) < Math.abs(parseInt(p.value) - currentYear) ? c : p;
+                    });
+                    yearSelect.value = closest.value;
+                }
+                filterAndDisplayYear(currentYear);
+            }, 300);
+        });
+    }
+    
+    // Toggle labels
+    const showLabelsCheck = document.getElementById('show-labels');
+    if (showLabelsCheck) {
+        showLabelsCheck.addEventListener('change', function(e) {
+            showLabels = e.target.checked;
+            
+            if (showLabels && allData) {
+                const features = allData.features.filter(f => {
+                    const start = f.properties.GWSYEAR || f.properties.gwsyear || 0;
+                    const end = f.properties.GWEYEAR || f.properties.gweyear || 9999;
+                    return start <= currentYear && end >= currentYear;
+                });
+                addCountryLabels(features);
+            } else {
+                countryLabels.forEach(l => map.removeLayer(l));
+                countryLabels = [];
+            }
+        });
+    }
+    
+    // Toggle capitals
+    const showCapsCheck = document.getElementById('show-capitals');
+    if (showCapsCheck) {
+        showCapsCheck.addEventListener('change', function(e) {
+            showCapitals = e.target.checked;
+            
+            if (showCapitals && allData) {
+                const features = allData.features.filter(f => {
+                    const start = f.properties.GWSYEAR || f.properties.gwsyear || 0;
+                    const end = f.properties.GWEYEAR || f.properties.gweyear || 9999;
+                    return start <= currentYear && end >= currentYear;
+                });
+                addCapitalMarkers(features);
+            } else {
+                capitalMarkers.forEach(m => map.removeLayer(m));
+                capitalMarkers = [];
+            }
+        });
     }
 });
 
-// Carica i dati iniziali
-loadHistoricalData(currentYear);
+console.log('✅ Script caricato');
