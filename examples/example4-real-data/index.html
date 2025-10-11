@@ -79,4 +79,65 @@
             <div class="year-slider-wrapper">
                 <label for="year-slider">🎚️ Esplora Timeline (1886-2019):</label>
                 <div class="slider-container">
-                    <span class="year-label
+                    <span class="year-label">1886</span>
+                    <input type="range" id="year-slider" min="1886" max="2019" value="1914" step="1">
+                    <span class="year-label">2019</span>
+                </div>
+                <div class="slider-display">
+                    <span>Anno: </span>
+                    <span id="slider-year">1914</span>
+                </div>
+            </div>
+            
+            <!-- Info -->
+            <div class="info-box">
+                <strong>ℹ️ Dataset CShapes 2.0:</strong> 134 anni di storia • Tutti i cambiamenti territoriali documentati
+            </div>
+        </div>
+
+        <!-- ========================================
+             MAPPA - QUESTO DEVE ESISTERE!
+             ======================================== -->
+        <div id="map"></div>
+
+        <!-- ========================================
+             INFO PANEL LATERALE
+             ======================================== -->
+        <aside class="info-panel">
+            <h3>🌍 Dettagli Territorio</h3>
+            <div id="territory-details">
+                <p style="color: #6c757d; font-style: italic;">
+                    Clicca su uno stato per visualizzare i dettagli
+                </p>
+            </div>
+        </aside>
+
+        <!-- ========================================
+             LEGEND / STATISTICHE
+             ======================================== -->
+        <footer class="legend">
+            <h4>📊 Statistiche Anno Corrente</h4>
+            <div id="stats">
+                <p>🏛️ <strong>Stati Totali:</strong> <span id="state-count">-</span></p>
+                <p>🌍 <strong>Area Totale:</strong> <span id="total-area">-</span> km²</p>
+                <p>⭐ <strong>Capitali:</strong> <span id="capital-count">-</span></p>
+                <p>📅 <strong>Anno:</strong> <span id="current-year">1914</span></p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- ========================================
+         LOADING OVERLAY
+         ======================================== -->
+    <div id="loading-overlay" class="loading-overlay" style="display: none;">
+        <div class="spinner"></div>
+        <div id="loading-text">Caricamento dati...</div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- Script principale -->
+    <script src="script.js"></script>
+</body>
+</html

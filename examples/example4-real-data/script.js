@@ -37,7 +37,7 @@ function initMap() {
 }
 
 // ========================================
-// CARICAMENTO DATASET - IDENTICO A TEST.HTML
+// CARICAMENTO DATASET - CSHAPES 2.0
 // ========================================
 
 async function loadCShapesDataset() {
@@ -46,7 +46,7 @@ async function loadCShapesDataset() {
     const possiblePaths = [
         '../../data/CShapes-2.0.geojson',
         '../data/CShapes-2.0.geojson',
-        'CShapes-2.0.geojson',
+        'data/CShapes-2.0.geojson',
         '/data/CShapes-2.0.geojson'
     ];
     
@@ -69,13 +69,13 @@ async function loadCShapesDataset() {
             const data = await response.json();
             
             console.log(`✅ JSON parsato`);
-            console.log(`   📦 Features: ${data.features.length}`);
+            console.log(`   📦 Features totali: ${data.features.length}`);
             
             allData = data;
             
             // Prima feature per debug
             const first = data.features[0];
-            console.log('🔬 Sample properties:', Object.keys(first.properties).slice(0, 5));
+            console.log('🔬 Sample properties:', Object.keys(first.properties));
             
             filterAndDisplayYear(currentYear);
             hideLoading();
@@ -94,7 +94,7 @@ async function loadCShapesDataset() {
 }
 
 // ========================================
-// FILTRAGGIO ANNO - IDENTICO A TEST.HTML
+// FILTRAGGIO ANNO - CSHAPES 2.0
 // ========================================
 
 function filterAndDisplayYear(year) {
@@ -119,7 +119,7 @@ function filterAndDisplayYear(year) {
     countryLabels.forEach(l => map.removeLayer(l));
     countryLabels = [];
     
-    // FILTRA - IDENTICO A TEST.HTML
+    // FILTRA PER ANNO usando GWSYEAR e GWEYEAR
     const filtered = allData.features.filter(f => {
         const props = f.properties;
         const start = props.GWSYEAR || props.gwsyear || 0;
@@ -130,12 +130,12 @@ function filterAndDisplayYear(year) {
     console.log(`✅ Anno ${year}: ${filtered.length} stati`);
     
     if (filtered.length === 0) {
-        console.warn('⚠️ Nessuno stato trovato');
+        console.warn('⚠️ Nessuno stato trovato per questo anno');
         hideLoading();
         return;
     }
     
-    // VISUALIZZA - IDENTICO A TEST.HTML
+    // VISUALIZZA
     currentLayer = L.geoJSON({
         type: 'FeatureCollection',
         features: filtered
@@ -158,7 +158,7 @@ function filterAndDisplayYear(year) {
         },
         onEachFeature: function(feature, layer) {
             const props = feature.properties;
-            const name = props.CNTRY_NAME || props.NAME || 'Unknown';
+            const name = props.CNTRY_NAME || props.cntry_name || props.NAME || 'Unknown';
             const code = props.GWCODE || props.gwcode || 'N/A';
             const cap = props.CAPNAME || props.capname || 'N/A';
             
@@ -267,10 +267,10 @@ function addCountryLabels(features) {
                 const avgLon = coords.reduce((sum, c) => sum + c[0], 0) / coords.length;
                 const avgLat = coords.reduce((sum, c) => sum + c[1], 0) / coords.length;
                 
-                const name = f.properties.CNTRY_NAME || 
-                           f.properties.cntry_name || 
-                           f.properties.NAME || 
-                           f.properties.name || '';
+                const name = f.properties.NAME || 
+                           f.properties.name || 
+                           f.properties.CNTRY_NAME || 
+                           f.properties.cntry_name || '';
                 
                 if (name) {
                     const label = L.marker([avgLat, avgLon], {
@@ -299,7 +299,7 @@ function showCountryDetails(props) {
     const div = document.getElementById('territory-details');
     if (!div) return;
     
-    const name = props.CNTRY_NAME || props.NAME || 'Sconosciuto';
+    const name = props.CNTRY_NAME || props.cntry_name || props.NAME || 'Sconosciuto';
     const code = props.GWCODE || props.gwcode || 'N/A';
     const iso = props.ISO1AL3 || props.iso1al3 || 'N/A';
     const cap = props.CAPNAME || props.capname || 'N/A';
@@ -315,7 +315,7 @@ function showCountryDetails(props) {
         <p><strong>Codice GW:</strong> ${code}</p>
         <p><strong>ISO:</strong> ${iso}</p>
         <p><strong>Capitale:</strong> ${cap}</p>
-        <p><strong>Coordinate:</strong> ${lat.toFixed(2)}°N, ${lon.toFixed(2)}°E</p>
+        <p><strong>Coordinate:</strong> ${lat ? lat.toFixed(2) : 'N/A'}°N, ${lon ? lon.toFixed(2) : 'N/A'}°E</p>
         <p><strong>Periodo:</strong> ${start} - ${end}</p>
         <p><strong>Area:</strong> ${formatArea(area)} km²</p>
     `;
