@@ -13,52 +13,87 @@
 <body>
     <div class="container">
         <header>
-            <h1>🗺️ ChronoWorld - Confini Storici Mondiali</h1>
-            <p>Dataset CShapes 2.0: 1886-2019 | Tutti i cambiamenti di confine documentati</p>
+            <h1>🗺️ ChronoWorld - Atlante Storico Completo</h1>
+            <p>125.000 anni di storia dell'umanità | Dalla preistoria all'era moderna</p>
         </header>
 
         <div class="controls">
             <div class="control-row">
                 <label for="year-select">📅 Seleziona Anno Storico:</label>
                 <select id="year-select">
-                    <optgroup label="📜 XIX Secolo">
-                        <option value="1886">1886 - Inizio Dataset</option>
-                        <option value="1890">1890</option>
-                        <option value="1900">1900 - Fine XIX Secolo</option>
+                    <optgroup label="🦴 Preistoria">
+                        <option value="-123000">123.000 a.C. - Comparsa Homo Sapiens</option>
+                        <option value="-10000">10.000 a.C. - Rivoluzione Neolitica</option>
+                        <option value="-8000">8.000 a.C. - Prime Città (Gerico)</option>
+                        <option value="-5000">5.000 a.C. - Età del Rame</option>
+                        <option value="-4000">4.000 a.C. - Civiltà Mesopotamiche</option>
+                        <option value="-3000">3.000 a.C. - Unificazione Egitto</option>
                     </optgroup>
                     
-                    <optgroup label="⚔️ Prima Guerra Mondiale">
-                        <option value="1910">1910 - Pre-WWI</option>
-                        <option value="1914" selected>1914 - Inizio WWI</option>
-                        <option value="1918">1918 - Fine WWI</option>
-                        <option value="1920">1920 - Trattato Versailles</option>
+                    <optgroup label="🏛️ Età Antica">
+                        <option value="-2000">2.000 a.C. - Impero Babilonese</option>
+                        <option value="-1500">1.500 a.C. - Civiltà Micenea</option>
+                        <option value="-1000">1.000 a.C. - Regno di Davide</option>
+                        <option value="-700">700 a.C. - Fondazione di Roma</option>
+                        <option value="-500">500 a.C. - Guerre Persiane</option>
+                        <option value="-400">400 a.C. - Egemonia Ateniese</option>
+                        <option value="-323">323 a.C. - Morte Alessandro Magno</option>
+                        <option value="-300">300 a.C. - Regni Ellenistici</option>
+                        <option value="-200">200 a.C. - Grande Muraglia Cinese</option>
+                        <option value="-123">123 a.C. - Riforme dei Gracchi</option>
+                        <option value="-100">100 a.C. - Primo Triumvirato</option>
+                        <option value="-1">1 a.C. - Nascita di Gesù Cristo</option>
                     </optgroup>
                     
-                    <optgroup label="🌍 Periodo Interbellico">
-                        <option value="1925">1925</option>
-                        <option value="1930">1930</option>
-                        <option value="1935">1935</option>
+                    <optgroup label="🏺 Età Classica">
+                        <option value="100">100 d.C. - Imperatore Traiano</option>
+                        <option value="200">200 d.C. - Massima Espansione Romana</option>
+                        <option value="300">300 d.C. - Editto di Milano</option>
+                        <option value="400">400 d.C. - Invasioni Barbariche</option>
+                        <option value="500">500 d.C. - Caduta Impero Romano</option>
+                        <option value="600">600 d.C. - Espansione Bizantina</option>
+                        <option value="700">700 d.C. - Conquiste Islamiche</option>
+                        <option value="800">800 d.C. - Incoronazione Carlo Magno</option>
+                        <option value="900">900 d.C. - Incursioni Vichinghe</option>
+                        <option value="1000">1.000 d.C. - Sacro Romano Impero</option>
                     </optgroup>
                     
-                    <optgroup label="💥 Seconda Guerra Mondiale">
-                        <option value="1939">1939 - Inizio WWII</option>
-                        <option value="1942">1942 - Apice WWII</option>
-                        <option value="1945">1945 - Fine WWII</option>
+                    <optgroup label="🏰 Medioevo">
+                        <option value="1100">1.100 d.C. - Prima Crociata</option>
+                        <option value="1200">1.200 d.C. - Gengis Khan</option>
+                        <option value="1279">1.279 d.C. - Dinastia Yuan in Cina</option>
+                        <option value="1300">1.300 d.C. - Dante Alighieri</option>
+                        <option value="1400">1.400 d.C. - Rinascimento Italiano</option>
                     </optgroup>
                     
-                    <optgroup label="❄️ Guerra Fredda">
-                        <option value="1950">1950 - Inizio Guerra Fredda</option>
-                        <option value="1960">1960 - Decolonizzazione</option>
-                        <option value="1970">1970</option>
-                        <option value="1980">1980</option>
-                        <option value="1989">1989 - Caduta Muro</option>
-                        <option value="1991">1991 - Fine URSS</option>
+                    <optgroup label="🌍 Età Moderna">
+                        <option value="1492">1.492 d.C. - Scoperta dell'America</option>
+                        <option value="1500">1.500 d.C. - Leonardo da Vinci</option>
+                        <option value="1530">1.530 d.C. - Riforma Protestante</option>
+                        <option value="1600">1.600 d.C. - Colonialismo Europeo</option>
+                        <option value="1650">1.650 d.C. - Pace di Vestfalia</option>
+                        <option value="1700">1.700 d.C. - Illuminismo</option>
+                        <option value="1715">1.715 d.C. - Morte di Luigi XIV</option>
+                        <option value="1783">1.783 d.C. - Indipendenza USA</option>
+                        <option value="1800">1.800 d.C. - Napoleone Bonaparte</option>
+                        <option value="1815">1.815 d.C. - Congresso di Vienna</option>
                     </optgroup>
                     
-                    <optgroup label="🌏 Era Contemporanea">
-                        <option value="2000">2000 - Nuovo Millennio</option>
-                        <option value="2010">2010</option>
-                        <option value="2019">2019 - Dati Più Recenti</option>
+                    <optgroup label="⚔️ XIX-XX Secolo">
+                        <option value="1880">1.880 d.C. - Colonialismo Africano</option>
+                        <option value="1900">1.900 d.C. - Belle Époque</option>
+                        <option value="1914" selected>1.914 d.C. - Inizio Grande Guerra</option>
+                        <option value="1920">1.920 d.C. - Trattato di Versailles</option>
+                        <option value="1930">1.930 d.C. - Grande Depressione</option>
+                        <option value="1938">1.938 d.C. - Vigilia Seconda Guerra</option>
+                        <option value="1945">1.945 d.C. - Fine Seconda Guerra</option>
+                        <option value="1960">1.960 d.C. - Decolonizzazione</option>
+                        <option value="1994">1.994 d.C. - Post Guerra Fredda</option>
+                    </optgroup>
+                    
+                    <optgroup label="🌐 Età Contemporanea">
+                        <option value="2000">2.000 d.C. - Nuovo Millennio</option>
+                        <option value="2010">2.010 d.C. - Era Digitale</option>
                     </optgroup>
                 </select>
             </div>
@@ -77,21 +112,21 @@
             
             <!-- Slider Timeline -->
             <div class="year-slider-wrapper">
-                <label for="year-slider">🎚️ Esplora Timeline (1886-2019):</label>
+                <label for="year-slider">🎚️ Esplora Timeline (54 anni storici disponibili):</label>
                 <div class="slider-container">
-                    <span class="year-label">1886</span>
-                    <input type="range" id="year-slider" min="1886" max="2019" value="1914" step="1">
-                    <span class="year-label">2019</span>
+                    <span class="year-label">123k a.C.</span>
+                    <input type="range" id="year-slider" min="0" max="53" value="30" step="1">
+                    <span class="year-label">2010</span>
                 </div>
                 <div class="slider-display">
                     <span>Anno: </span>
-                    <span id="slider-year">1914</span>
+                    <span id="slider-year">1914 d.C.</span>
                 </div>
             </div>
             
             <!-- Info -->
             <div class="info-box">
-                <strong>ℹ️ Dataset CShapes 2.0:</strong> 134 anni di storia • Tutti i cambiamenti territoriali documentati
+                <strong>ℹ️ Dataset Completo:</strong> 54 mappe storiche disponibili • Dalla preistoria all'era moderna
             </div>
         </div>
 
