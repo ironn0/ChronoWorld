@@ -138,9 +138,6 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
-# Large GeoJSON historical data files (download separately)
-# See data/README_DOWNLOAD.md for instructions
-data/*.geojson
-!data/world_1900.geojson
-!data/world_1914.geojson
+# Large GeoJSON historical data files
+# Tutti i file GeoJSON storici ora inclusi nel repository
 data/cshapes.zip
